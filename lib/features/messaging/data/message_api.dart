@@ -24,6 +24,7 @@ class MessageApi {
             timestamp: e['timestamp'],
             sender: e['sender'],
             status: e['status'] ?? 'sending',
+            bytesBase64: e['bytesBase64'],
           ),
         )
         .toList();
@@ -47,6 +48,7 @@ class MessageApi {
               'timestamp': m.timestamp,
               'sender': m.sender,
               'status': m.status,
+              'bytesBase64': m.bytesBase64,
             },
           )
           .toList(),

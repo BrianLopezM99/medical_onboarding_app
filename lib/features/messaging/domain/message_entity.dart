@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class Message {
   final String id;
   final String? content;
@@ -25,12 +27,14 @@ enum MessageStatus { sending, received, read }
 
 class MessageAttachment {
   final String fileName;
-  final String filePath;
   final String mimeType;
+  final String? filePath;
+  final Uint8List? bytes;
 
   MessageAttachment({
     required this.fileName,
-    required this.filePath,
     required this.mimeType,
+    this.filePath,
+    this.bytes,
   });
 }

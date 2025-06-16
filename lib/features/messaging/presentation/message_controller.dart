@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medical_onboarding_app/features/messaging/application/message_service.dart';
@@ -128,7 +129,7 @@ class MessageController extends StateNotifier<List<Message>> {
   }
 
   Future<void> sendAttachment(
-    String filePath,
+    Uint8List bytes,
     String fileName,
     String mimeType,
   ) async {
@@ -140,8 +141,9 @@ class MessageController extends StateNotifier<List<Message>> {
       sender: MessageSender.user,
       attachment: MessageAttachment(
         fileName: fileName,
-        filePath: filePath,
+        filePath: '',
         mimeType: mimeType,
+        bytes: bytes,
       ),
       status: MessageStatus.sending,
     );
@@ -152,12 +154,41 @@ class MessageController extends StateNotifier<List<Message>> {
     final updatedMessages = [...storedMessages, fileMessage];
     await service.repo.saveMessages(customerId, updatedMessages);
 
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () {
       _updateMessageStatus(fileMessage.id, MessageStatus.received);
 
       Future.delayed(const Duration(seconds: 1), () {
         _updateMessageStatus(fileMessage.id, MessageStatus.read);
       });
     });
+
+    await Future.delayed(Duration(seconds: 5));
+    isTyping = true;
+    state = List.from(state);
+
+    Future.delayed(Duration(seconds: 2 + Random().nextInt(3)), () async {
+      final agentMessage = Message(
+        id: DateTime.now().microsecondsSinceEpoch.toString(),
+        content: 'I have received the "$fileName" file, thank you.',
+        timestamp: DateTime.now(),
+        sender: MessageSender.agent,
+      );
+
+      final currentMessages = await service.repo.getMessages(customerId);
+      final finalMessages = [...currentMessages, agentMessage];
+      await service.repo.saveMessages(customerId, finalMessages);
+
+      state = finalMessages;
+      isTyping = false;
+      state = List.from(state);
+    });
+  }
+
+  Future<void> sendImageFromBytes(
+    Uint8List bytes,
+    String fileName,
+    String mimeType,
+  ) async {
+    await sendAttachment(bytes, fileName, mimeType);
   }
 }

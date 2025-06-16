@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medical_onboarding_app/features/messaging/domain/message_entity.dart';
@@ -45,11 +48,11 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
   String _statusText(MessageStatus status) {
     switch (status) {
       case MessageStatus.sending:
-        return 'Enviando...';
+        return 'Sending...';
       case MessageStatus.received:
-        return 'Recibido';
+        return 'Recived';
       case MessageStatus.read:
-        return 'Leído';
+        return 'Readed';
       default:
         return '';
     }
@@ -76,6 +79,101 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               itemBuilder: (context, index) {
                 final message = messages[index];
                 final isUser = message.sender == MessageSender.user;
+
+                if (message.attachment != null) {
+                  final attachment = message.attachment!;
+                  final isImage = attachment.mimeType.startsWith('image/');
+
+                  return Align(
+                    alignment: isUser
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isUser ? Colors.blue : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: isUser
+                            ? CrossAxisAlignment.end
+                            : CrossAxisAlignment.start,
+                        children: [
+                          if (isImage)
+                            attachment.bytes != null
+                                ? Image.memory(
+                                    attachment.bytes!,
+                                    width: 150,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  )
+                                : !kIsWeb && attachment.filePath != null
+                                ? Image.file(
+                                    File(attachment.filePath!),
+                                    width: 150,
+                                    height: 150,
+                                    fit: BoxFit.cover,
+                                  )
+                                : const Text('Image cannot be load'),
+                          if (!isImage) ...[
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(
+                                  Icons.picture_as_pdf,
+                                  color: Colors.red,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  attachment.fileName,
+                                  style: TextStyle(
+                                    color: isUser ? Colors.white : Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'File: ${attachment.mimeType}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isUser
+                                    ? Colors.white70
+                                    : Colors.grey[800],
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ],
+                          if (isUser)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4),
+                              child: message.status == MessageStatus.sending
+                                  ? const SizedBox(
+                                      height: 12,
+                                      width: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white70,
+                                      ),
+                                    )
+                                  : Text(
+                                      _statusText(message.status),
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.white70,
+                                      ),
+                                    ),
+                            ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+
                 return Align(
                   alignment: isUser
                       ? Alignment.centerRight
@@ -101,14 +199,23 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                         if (isUser)
                           Padding(
                             padding: const EdgeInsets.only(top: 4),
-                            child: Text(
-                              _statusText(message.status),
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontStyle: FontStyle.italic,
-                                color: Colors.white70,
-                              ),
-                            ),
+                            child: message.status == MessageStatus.sending
+                                ? const SizedBox(
+                                    height: 12,
+                                    width: 12,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white70,
+                                    ),
+                                  )
+                                : Text(
+                                    _statusText(message.status),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.white70,
+                                    ),
+                                  ),
                           ),
                       ],
                     ),
@@ -151,26 +258,39 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                   onPressed: () async {
                     final result = await FilePicker.platform.pickFiles(
                       type: FileType.image,
+                      withData: true,
                     );
-                    if (result != null && result.files.single.path != null) {
+                    if (result != null && result.files.single.bytes != null) {
+                      final file = result.files.single;
+
+                      final bytes = file.bytes!;
+                      final fileName = file.name;
+                      final mimeType = lookupMimeType(fileName) ?? 'image/*';
+
                       ref
                           .read(
                             messageControllerProvider(
                               widget.customerId,
                             ).notifier,
                           )
-                          .sendImage(result.files.single.path!);
+                          .sendImageFromBytes(bytes, fileName, mimeType);
                     }
                   },
                 ),
+
                 IconButton(
                   icon: const Icon(Icons.attach_file),
                   onPressed: () async {
-                    final result = await FilePicker.platform.pickFiles();
-                    if (result != null && result.files.single.path != null) {
-                      final filePath = result.files.single.path!;
+                    final result = await FilePicker.platform.pickFiles(
+                      withData: true,
+                    );
+                    if (result != null && result.files.single.bytes != null) {
+                      final file = result.files.single;
+
+                      final bytes = file.bytes!;
+                      final fileName = file.name;
                       final mimeType =
-                          lookupMimeType(filePath) ??
+                          lookupMimeType(fileName) ??
                           'application/octet-stream';
 
                       ref
@@ -179,15 +299,10 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                               widget.customerId,
                             ).notifier,
                           )
-                          .sendAttachment(
-                            filePath,
-                            result.files.single.name,
-                            mimeType,
-                          );
+                          .sendAttachment(bytes, fileName, mimeType);
                     }
                   },
                 ),
-
                 IconButton(
                   icon: const Icon(Icons.send),
                   onPressed: _sendMessage,

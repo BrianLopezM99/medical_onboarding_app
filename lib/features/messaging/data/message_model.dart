@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:medical_onboarding_app/features/messaging/domain/message_entity.dart';
 
 class MessageModel {
@@ -11,6 +13,8 @@ class MessageModel {
   final String sender;
   final String status;
 
+  final String? bytesBase64;
+
   MessageModel({
     required this.id,
     this.content,
@@ -21,7 +25,11 @@ class MessageModel {
     required this.timestamp,
     required this.sender,
     required this.status,
+    this.bytesBase64,
   });
+
+  Uint8List? get bytes =>
+      bytesBase64 != null ? base64Decode(bytesBase64!) : null;
 
   factory MessageModel.fromEntity(Message m) => MessageModel(
     id: m.id,
@@ -33,6 +41,9 @@ class MessageModel {
     timestamp: m.timestamp.toIso8601String(),
     sender: m.sender.name,
     status: m.status.name,
+    bytesBase64: m.attachment?.bytes != null
+        ? base64Encode(m.attachment!.bytes!)
+        : null,
   );
 
   Message toEntity() => Message(
@@ -44,13 +55,14 @@ class MessageModel {
             fileName: fileName!,
             filePath: filePath!,
             mimeType: mimeType!,
+            bytes: bytes,
           )
         : null,
     timestamp: DateTime.parse(timestamp),
     sender: MessageSender.values.firstWhere(
       (e) => e.name == sender,
       orElse: () {
-        print('Warning: sender desconocido: $sender');
+        print('Warning: Unknown sender: $sender');
         return MessageSender.user;
       },
     ),
@@ -58,7 +70,7 @@ class MessageModel {
     status: MessageStatus.values.firstWhere(
       (e) => e.name == status,
       orElse: () {
-        print('Warning: status desconocido: $status');
+        print('Warning: Unknown status: $status');
         return MessageStatus.sending;
       },
     ),
