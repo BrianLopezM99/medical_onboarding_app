@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medical_onboarding_app/features/messaging/presentation/pages/message_screen.dart';
 import '../../domain/customer_entity.dart';
 import '../customer_controller.dart';
 import 'customer_form_screen.dart';
@@ -160,6 +161,21 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          IconButton(
+                            icon: const Icon(Icons.chat),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => MessageScreen(
+                                    customerId: customer.id,
+                                    customerName:
+                                        '${customer.firstName} ${customer.lastName}',
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                           IconButton(
                             icon: const Icon(Icons.edit, color: Colors.blue),
                             onPressed: () {
