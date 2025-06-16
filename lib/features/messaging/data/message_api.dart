@@ -1,13 +1,14 @@
 import 'dart:convert';
+
 import 'package:medical_onboarding_app/features/messaging/data/message_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MessageApi {
-  static const _key = 'messages';
+  static const _prefix = 'messages_';
 
-  Future<List<MessageModel>> fetchMessages() async {
+  Future<List<MessageModel>> fetchMessages(String customerId) async {
     final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_key);
+    final raw = prefs.getString('$_prefix$customerId');
     if (raw == null) return [];
 
     final List decoded = jsonDecode(raw);
@@ -16,14 +17,22 @@ class MessageApi {
           (e) => MessageModel(
             id: e['id'],
             content: e['content'],
+            imageUrl: e['imageUrl'],
+            fileName: e['fileName'],
+            filePath: e['filePath'],
+            mimeType: e['mimeType'],
             timestamp: e['timestamp'],
             sender: e['sender'],
+            status: e['status'] ?? 'sending',
           ),
         )
         .toList();
   }
 
-  Future<void> saveMessages(List<MessageModel> messages) async {
+  Future<void> saveMessages(
+    String customerId,
+    List<MessageModel> messages,
+  ) async {
     final prefs = await SharedPreferences.getInstance();
     final encoded = jsonEncode(
       messages
@@ -31,12 +40,17 @@ class MessageApi {
             (m) => {
               'id': m.id,
               'content': m.content,
+              'imageUrl': m.imageUrl,
+              'fileName': m.fileName,
+              'filePath': m.filePath,
+              'mimeType': m.mimeType,
               'timestamp': m.timestamp,
               'sender': m.sender,
+              'status': m.status,
             },
           )
           .toList(),
     );
-    await prefs.setString(_key, encoded);
+    await prefs.setString('$_prefix$customerId', encoded);
   }
 }
