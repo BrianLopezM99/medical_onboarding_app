@@ -1,163 +1,128 @@
-¡Genial, Brian! Aquí tienes un `README.md` en inglés, **muy detallado**, ideal para incluir en tu repositorio de GitHub. Este archivo describe el propósito del proyecto, cómo está estructurado, cómo ejecutarlo, tecnologías utilizadas, y detalles del flujo de chat IA simulado.
-
----
 
 ```markdown
-# 🦷 Medical Onboarding Assistant (Flutter Web)
+# 🩺 Medical Onboarding Chat App (Flutter Web)
 
-This is a **technical test project** built using **Flutter Web** to simulate a **medical onboarding assistant**. The app provides a chat interface for support agents to interact with new clients and collect their medical documents through a guided conversation powered by a simulated AI assistant.
+This is a **Flutter Web** application built as part of a technical assessment. It simulates a medical onboarding assistant that guides users (patients) through a step-by-step document collection process using a chat interface.
 
 ---
 
 ## ✨ Features
 
-- ✅ Chat system with simulated encrypted messaging
-- ✅ Simulated AI assistant that guides document collection
-- ✅ File upload support with simulated data extraction
-- ✅ Automatic response timing for realism (typing delays, read receipts)
-- ✅ Persistent local storage for chat history (per customer)
-- ✅ Clean Architecture using Riverpod for state management
+- 📄 Document-based conversation flow
+- 🧠 AI-like assistant with scripted responses
+- 📦 File upload simulation (insurance card, medical report, ID, etc.)
+- 📥 Local message persistence (simulated backend)
+- 💬 Typing indicator
+- ✅ Clean Architecture Lite with Riverpod for state management
 
 ---
 
-## 📁 Project Structure (Clean Architecture)
+## 📁 Project Structure
 
 ```
 
 lib/
-├── core/
-│   └── utils/               # Common utility classes
+├── app/                  # App-level config (routes, themes)
+├── core/                 # Shared core utils and base classes
 ├── features/
-│   ├── customer/            # Customer-related logic
-│   ├── messaging/           # Chat and message flow
-│   └── ai\_assistant/        # AI logic and prompts
-├── shared/                  # Shared components/widgets
-└── main.dart                # App entry point
+│   ├── chat/             # Chat assistant module
+│   │   ├── data/         # Simulated API + model
+│   │   ├── domain/       # Entity, use case, repository
+│   │   ├── presentation/ # UI widgets and screens
+│   │   └── application/  # Riverpod notifiers and logic
+│   └── customer/         # Customer management (if needed)
 
 ````
 
 ---
 
-## 🧠 AI Assistant Flow
+## 🧠 AI Simulation Behavior
 
-The assistant collects documents in a specific **ordered flow**:
+The chat assistant walks the user through this document request flow:
 
-1. Insurance card
-2. Medical report
-3. COVID vaccine certificate
-4. Allergy documentation
-5. ID
+1. Insurance card  
+2. Medical report  
+3. COVID vaccine certificate  
+4. Allergy documentation  
+5. Official ID
 
-Each step includes:
+Each uploaded file triggers:
+- A confirmation response
+- A simulated data extraction in JSON
+- The next document request
 
-- Confirmation message (e.g., _“Thanks for the insurance card!”_)
-- Next prompt (e.g., _“Please upload your medical report”_)
-
-After the last step (`ID`), the assistant says:
-
-> _"ID received. Registration is now complete."_
-
-Then, the process **restarts automatically**, showing:
-
-> _"Hello. Please upload your insurance card."_
+At the end, it restarts the loop with a welcome prompt again.
 
 ---
 
-## 📦 Tech Stack
-
-- **Flutter Web** (latest stable)
-- **Riverpod** – state management
-- **Clean Architecture Lite** – domain/data separation
-- **Local Storage** – simulated persistence
-- **Responsive UI** – works in browser (desktop/mobile)
-- **Fake AI logic** – rule-based prompt system
-
----
-
-## 🚀 Getting Started
-
-### 1. Requirements
-
-- Flutter SDK (latest stable)  
-- Dart >= 3.x  
-- A browser (Chrome recommended)
-
-### 2. Clone the Repo
-
-```bash
-git clone https://github.com/yourusername/medical-onboarding-assistant.git
-cd medical-onboarding-assistant
-````
-
-### 3. Install Dependencies
+## 🧪 Run the App Locally
 
 ```bash
 flutter pub get
-```
+flutter run -d chrome
+````
 
-### 4. Run the App (Web)
+To build for web:
 
 ```bash
-flutter run -d chrome
+flutter build web
 ```
 
 ---
 
-## 🧪 Simulated AI Logic
+## 🚀 Deploy to Netlify
 
-The assistant uses a simple function to generate replies and simulate data extraction:
+1. Run:
 
-* Based on file name and current prompt
-* Each file uploaded produces a confirmation + next instruction
-* JSON data is printed in chat from a simulated extraction
+   ```bash
+   flutter build web
+   ```
 
-Example:
+2. Go to: [https://app.netlify.com/drop](https://app.netlify.com/drop)
 
-```json
-{
-  "insuranceProvider": "Blue Shield",
-  "policyNumber": "1234567890",
-  "groupNumber": "BSH123"
-}
+3. Drag the `build/web` folder into the browser.
+
+### Optional: Set up with GitHub
+
+You can also connect the repo with Netlify and use:
+
+* **Build command:** `flutter build web`
+* **Publish directory:** `build/web`
+
+> For single-page app routing, add a `_redirects` file with:
+>
+> ```
+> /* /index.html 200
+> ```
+
+---
+
+## 🙋‍♂️ About the Author
+
+This project was built by **Brian López** as part of a technical assessment.
+The main goal was to create a clear and structured medical onboarding chatbot UI using Flutter Web and Clean Architecture principles.
+
+---
+
+## 🧠 AI-Assisted Notes
+
+AI assistance was used primarily for:
+
+* Building the **basic layout** of the app (containers, styles, buttons)
+* Improving the **structure and readability** of this `README.md`
+
+⚠️ No functional code or business logic was written by the AI. All architecture, logic, and app behavior were implemented manually.
+
+---
+
+## 📸 Screenshots
+
+*(Add screenshots here if needed)*
+
+---
+
+## 📜 License
+
+This project is for demonstration and evaluation purposes only.
+
 ```
-
----
-
-## 🧼 Code Highlights
-
-### Message Sending (Text or File)
-
-* Includes delays for:
-
-  * Sending
-  * Received
-  * Read
-* Triggers typing state while "AI" responds
-* Response delays are randomized for realism
-
-### State Management
-
-* Each customer has isolated chat
-* Messages are saved and retrieved using a simulated repository
-
----
-
-## 🧊 Limitations
-
-* No real backend (data is stored in memory or simulated locally)
-* AI is rule-based, not powered by real ML models
-* No authentication/login flow implemented
-
----
-
-## 📄 License
-
-This project is for technical demonstration purposes only and does not include a license for production use.
-
----
-
-## 👤 Author
-
-**Brian López**
-Flutter Developer – Technical Test
-
