@@ -1,6 +1,5 @@
-
-```markdown
-# 🩺 Medical Onboarding Chat App (Flutter Web)
+# 🩺 Medical Onboarding Chat App  
+A step-by-step chatbot built with Flutter Web + Clean Architecture
 
 This is a **Flutter Web** application built as part of a technical assessment. It simulates a medical onboarding assistant that guides users (patients) through a step-by-step document collection process using a chat interface.
 
@@ -8,19 +7,18 @@ This is a **Flutter Web** application built as part of a technical assessment. I
 
 ## ✨ Features
 
-- 📄 Document-based conversation flow
-- 🧠 AI-like assistant with scripted responses
-- 📦 File upload simulation (insurance card, medical report, ID, etc.)
-- 📥 Local message persistence (simulated backend)
-- 💬 Typing indicator
-- ✅ Clean Architecture Lite with Riverpod for state management
+- 📄 Document-based conversation flow  
+- 🧠 AI-like assistant with scripted responses  
+- 📦 File upload simulation (insurance card, medical report, ID, etc.)  
+- 📥 Local message persistence (simulated backend)  
+- 💬 Typing indicator  
+- ✅ Clean Architecture Lite with Riverpod for state management  
 
 ---
 
 ## 📁 Project Structure
 
-```
-
+```bash
 lib/
 ├── app/                  # App-level config (routes, themes)
 ├── core/                 # Shared core utils and base classes
@@ -31,7 +29,6 @@ lib/
 │   │   ├── presentation/ # UI widgets and screens
 │   │   └── application/  # Riverpod notifiers and logic
 │   └── customer/         # Customer management (if needed)
-
 ````
 
 ---
@@ -40,16 +37,17 @@ lib/
 
 The chat assistant walks the user through this document request flow:
 
-1. Insurance card  
-2. Medical report  
-3. COVID vaccine certificate  
-4. Allergy documentation  
+1. Insurance card
+2. Medical report
+3. COVID vaccine certificate
+4. Allergy documentation
 5. Official ID
 
 Each uploaded file triggers:
-- A confirmation response
-- A simulated data extraction in JSON
-- The next document request
+
+* A confirmation response
+* A simulated data extraction in JSON
+* The next document request
 
 At the end, it restarts the loop with a welcome prompt again.
 
@@ -60,7 +58,7 @@ At the end, it restarts the loop with a welcome prompt again.
 ```bash
 flutter pub get
 flutter run -d chrome
-````
+```
 
 To build for web:
 
@@ -82,7 +80,7 @@ flutter build web
 
 3. Drag the `build/web` folder into the browser.
 
-### Optional: Set up with GitHub
+### 💡 Tip: Deploy with GitHub Integration
 
 You can also connect the repo with Netlify and use:
 
@@ -91,7 +89,7 @@ You can also connect the repo with Netlify and use:
 
 > For single-page app routing, add a `_redirects` file with:
 >
-> ```
+> ```bash
 > /* /index.html 200
 > ```
 
@@ -111,18 +109,11 @@ AI assistance was used primarily for:
 * Building the **basic layout** of the app (containers, styles, buttons)
 * Improving the **structure and readability** of this `README.md`
 
-⚠️ No functional code or business logic was written by the AI. All architecture, logic, and app behavior were implemented manually.
-
----
-
-## 📸 Screenshots
-
-*(Add screenshots here if needed)*
+⚠️ No functional code or business logic was written by the AI.
+All architecture, logic, and app behavior were implemented manually.
 
 ---
 
 ## 📜 License
 
 This project is for demonstration and evaluation purposes only.
-
-```
