@@ -135,8 +135,9 @@ class _CustomerFormState extends State<CustomerForm> {
                   ],
                   validator: (val) {
                     if (val == null || val.trim().isEmpty) return 'Required';
-                    if (RegExp(r'\d').hasMatch(val))
+                    if (RegExp(r'\d').hasMatch(val)) {
                       return 'Must not contain numbers';
+                    }
                     return null;
                   },
                   readOnly: isReadOnly,

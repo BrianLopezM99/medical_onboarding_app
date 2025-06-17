@@ -140,7 +140,7 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: DataTable(
-                        headingRowColor: MaterialStateColor.resolveWith(
+                        headingRowColor: WidgetStateColor.resolveWith(
                           (states) => ColorsCore.greenTwo,
                         ),
                         columns: [

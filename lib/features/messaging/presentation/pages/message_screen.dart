@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:medical_onboarding_app/features/core/colors.dart';
@@ -82,8 +79,6 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
         return 'Recived';
       case MessageStatus.read:
         return 'Readed';
-      default:
-        return '';
     }
   }
 
@@ -177,8 +172,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                         if (message.attachment != null) ...[
                           IntrinsicWidth(
                             child: Row(
-                              mainAxisSize: MainAxisSize
-                                  .min, // Importante para que no ocupe todo el ancho
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(
                                   Icons.picture_as_pdf,
