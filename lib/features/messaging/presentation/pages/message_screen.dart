@@ -11,11 +11,13 @@ import 'package:mime/mime.dart';
 class MessageScreen extends ConsumerStatefulWidget {
   final String customerId;
   final String customerName;
+  final bool isAi;
 
   const MessageScreen({
     super.key,
     required this.customerId,
     required this.customerName,
+    required this.isAi,
   });
 
   @override
@@ -26,10 +28,36 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
+  bool _initialMessageSent = false;
+
+  void _sendInitialAiMessageIfNeeded() {
+    if (!_initialMessageSent && widget.isAi) {
+      _initialMessageSent = true;
+
+      ref.read(
+        messageControllerProvider(
+          MessageControllerParams(
+            customerId: widget.customerId,
+            isAiChat: widget.isAi,
+          ),
+        ).notifier,
+      );
+    }
+  }
+
   void _sendMessage() {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
-    ref.read(messageControllerProvider(widget.customerId).notifier).send(text);
+    ref
+        .read(
+          messageControllerProvider(
+            MessageControllerParams(
+              customerId: widget.customerId,
+              isAiChat: widget.isAi,
+            ),
+          ).notifier,
+        )
+        .send(text);
     _controller.clear();
   }
 
@@ -60,13 +88,32 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final messages = ref.watch(messageControllerProvider(widget.customerId));
+    final messages = ref.watch(
+      messageControllerProvider(
+        MessageControllerParams(
+          customerId: widget.customerId,
+          isAiChat: widget.isAi,
+        ),
+      ),
+    );
+
     final isTyping = ref
-        .read(messageControllerProvider(widget.customerId).notifier)
+        .read(
+          messageControllerProvider(
+            MessageControllerParams(
+              customerId: widget.customerId,
+              isAiChat: widget.isAi,
+            ),
+          ).notifier,
+        )
         .isTyping;
 
     _scrollToBottom();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _sendInitialAiMessageIfNeeded();
+    });
 
+    print(widget.isAi);
     return Scaffold(
       appBar: AppBar(title: Text('Chat with ${widget.customerName}')),
       body: Column(
@@ -267,13 +314,46 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                       final fileName = file.name;
                       final mimeType = lookupMimeType(fileName) ?? 'image/*';
 
-                      ref
-                          .read(
-                            messageControllerProvider(
-                              widget.customerId,
-                            ).notifier,
-                          )
-                          .sendImageFromBytes(bytes, fileName, mimeType);
+                      final controller = ref.read(
+                        messageControllerProvider(
+                          MessageControllerParams(
+                            customerId: widget.customerId,
+                            isAiChat: widget.isAi,
+                          ),
+                        ).notifier,
+                      );
+
+                      final messages = ref.read(
+                        messageControllerProvider(
+                          MessageControllerParams(
+                            customerId: widget.customerId,
+                            isAiChat: widget.isAi,
+                          ),
+                        ),
+                      );
+
+                      final lastPrompt =
+                          messages.reversed
+                              .firstWhere(
+                                (m) =>
+                                    m.sender == MessageSender.user &&
+                                    m.content != null,
+                                orElse: () => Message(
+                                  id: '0',
+                                  content: '',
+                                  timestamp: DateTime.now(),
+                                  sender: MessageSender.user,
+                                ),
+                              )
+                              .content ??
+                          'Image upload';
+
+                      await controller.sendImageFromBytes(
+                        bytes,
+                        fileName,
+                        mimeType,
+                        lastPrompt,
+                      );
                     }
                   },
                 ),
@@ -293,13 +373,41 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
                           lookupMimeType(fileName) ??
                           'application/octet-stream';
 
-                      ref
-                          .read(
-                            messageControllerProvider(
-                              widget.customerId,
-                            ).notifier,
-                          )
-                          .sendAttachment(bytes, fileName, mimeType);
+                      final controller = ref.read(
+                        messageControllerProvider(
+                          MessageControllerParams(
+                            customerId: widget.customerId,
+                            isAiChat: widget.isAi,
+                          ),
+                        ).notifier,
+                      );
+
+                      final messages = ref.read(
+                        messageControllerProvider(
+                          MessageControllerParams(
+                            customerId: widget.customerId,
+                            isAiChat: widget.isAi,
+                          ),
+                        ),
+                      );
+
+                      final lastPrompt =
+                          messages
+                              .where(
+                                (m) =>
+                                    m.sender == MessageSender.user &&
+                                    m.content != null,
+                              )
+                              .lastOrNull
+                              ?.content ??
+                          'Document upload';
+
+                      await controller.sendAttachment(
+                        bytes,
+                        fileName,
+                        mimeType,
+                        lastPrompt,
+                      );
                     }
                   },
                 ),

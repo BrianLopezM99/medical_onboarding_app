@@ -168,6 +168,7 @@ class _CustomerListScreenState extends ConsumerState<CustomerListScreen> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (_) => MessageScreen(
+                                    isAi: false,
                                     customerId: customer.id,
                                     customerName:
                                         '${customer.firstName} ${customer.lastName}',
