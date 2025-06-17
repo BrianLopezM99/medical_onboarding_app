@@ -88,120 +88,212 @@ class _CustomerFormState extends State<CustomerForm> {
 
     return Form(
       key: _formKey,
-      child: Column(
-        children: [
-          TextFormField(
-            controller: _firstNameController,
-            decoration: const InputDecoration(labelText: 'First Name'),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
-              LengthLimitingTextInputFormatter(50),
-            ],
-            validator: (val) =>
-                val == null || val.trim().isEmpty ? 'Required' : null,
-            readOnly: isReadOnly,
-          ),
-
-          TextFormField(
-            controller: _lastNameController,
-            decoration: const InputDecoration(labelText: 'Last Name'),
-            inputFormatters: [
-              FilteringTextInputFormatter.allow(
-                RegExp(r'[a-zA-Z\s]'),
-              ), // solo letras y espacios
-              LengthLimitingTextInputFormatter(50),
-            ],
-            validator: (val) {
-              if (val == null || val.trim().isEmpty) return 'Required';
-              if (RegExp(r'\d').hasMatch(val))
-                return 'Must not contain numbers';
-              return null;
-            },
-            readOnly: isReadOnly,
-          ),
-
-          TextFormField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'Email'),
-            validator: (val) {
-              if (val == null || val.trim().isEmpty) return 'Required';
-              if (!RegExp(r'^[\w\.-]+@[\w\.-]+\.\w{2,4}$').hasMatch(val)) {
-                return 'Invalid email';
-              }
-              return null;
-            },
-            readOnly: isReadOnly,
-          ),
-
-          TextFormField(
-            controller: _phoneController,
-            decoration: const InputDecoration(labelText: 'Phone'),
-            inputFormatters: [
-              FilteringTextInputFormatter.digitsOnly,
-              LengthLimitingTextInputFormatter(15),
-            ],
-            validator: (val) {
-              if (val == null || val.isEmpty) return null;
-              if (val.length < 10) return 'At least 10 digits';
-              return null;
-            },
-            readOnly: isReadOnly,
-          ),
-
-          const SizedBox(height: 16),
-
-          GestureDetector(
-            onTap: isReadOnly ? null : _pickDate,
-            child: AbsorbPointer(
-              child: TextFormField(
-                decoration: const InputDecoration(labelText: 'Date of Birth'),
-                readOnly: true,
-                controller: TextEditingController(
-                  text: _selectedDate != null
-                      ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
-                      : '',
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SizedBox(
+                width: 350,
+                child: TextFormField(
+                  controller: _firstNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'First Name',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+                    LengthLimitingTextInputFormatter(50),
+                  ],
+                  validator: (val) =>
+                      val == null || val.trim().isEmpty ? 'Required' : null,
+                  readOnly: isReadOnly,
                 ),
-                validator: (val) =>
-                    _selectedDate == null ? 'Select a date' : null,
               ),
-            ),
-          ),
 
-          TextFormField(
-            controller: _medicalRecordController,
-            decoration: const InputDecoration(
-              labelText: 'Medical Record Number',
-            ),
-            inputFormatters: [
-              FilteringTextInputFormatter.deny(RegExp(r'\s')),
+              const SizedBox(height: 16),
 
-              LengthLimitingTextInputFormatter(10),
+              SizedBox(
+                width: 350,
+                child: TextFormField(
+                  controller: _lastNameController,
+                  decoration: const InputDecoration(
+                    labelText: 'Last Name',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]')),
+                    LengthLimitingTextInputFormatter(50),
+                  ],
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) return 'Required';
+                    if (RegExp(r'\d').hasMatch(val))
+                      return 'Must not contain numbers';
+                    return null;
+                  },
+                  readOnly: isReadOnly,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: 350,
+                child: TextFormField(
+                  controller: _emailController,
+                  decoration: const InputDecoration(
+                    labelText: 'Email',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                  ),
+                  validator: (val) {
+                    if (val == null || val.trim().isEmpty) return 'Required';
+                    if (!RegExp(
+                      r'^[\w\.-]+@[\w\.-]+\.\w{2,4}$',
+                    ).hasMatch(val)) {
+                      return 'Invalid email';
+                    }
+                    return null;
+                  },
+                  readOnly: isReadOnly,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: 350,
+                child: TextFormField(
+                  controller: _phoneController,
+                  decoration: const InputDecoration(
+                    labelText: 'Phone',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(15),
+                  ],
+                  validator: (val) {
+                    if (val == null || val.isEmpty) return null;
+                    if (val.length < 10) return 'At least 10 digits';
+                    return null;
+                  },
+                  readOnly: isReadOnly,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              GestureDetector(
+                onTap: isReadOnly ? null : _pickDate,
+                child: AbsorbPointer(
+                  child: SizedBox(
+                    width: 350,
+                    child: TextFormField(
+                      decoration: const InputDecoration(
+                        labelText: 'Date of Birth',
+                        border: OutlineInputBorder(),
+                        contentPadding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 14,
+                        ),
+                      ),
+                      readOnly: true,
+                      controller: TextEditingController(
+                        text: _selectedDate != null
+                            ? DateFormat('yyyy-MM-dd').format(_selectedDate!)
+                            : '',
+                      ),
+                      validator: (val) =>
+                          _selectedDate == null ? 'Select a date' : null,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: 350,
+                child: TextFormField(
+                  controller: _medicalRecordController,
+                  decoration: const InputDecoration(
+                    labelText: 'Medical Record Number',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                  ),
+                  inputFormatters: [
+                    FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                    LengthLimitingTextInputFormatter(10),
+                  ],
+                  validator: (val) {
+                    if (val == null || val.isEmpty) return 'Required';
+                    if (val.length < 5) return 'Must be at least 5 characters';
+                    return null;
+                  },
+                  readOnly: isReadOnly,
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              SizedBox(
+                width: 350,
+                child: DropdownButtonFormField<CustomerStatus>(
+                  value: _status,
+                  decoration: const InputDecoration(
+                    labelText: 'Status',
+                    border: OutlineInputBorder(),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 14,
+                    ),
+                  ),
+                  items: CustomerStatus.values.map((status) {
+                    return DropdownMenuItem(
+                      value: status,
+                      child: Text(status.name),
+                    );
+                  }).toList(),
+                  onChanged: isReadOnly
+                      ? null
+                      : (value) => setState(() => _status = value),
+                  validator: (value) =>
+                      value == null ? 'Please select a status' : null,
+                ),
+              ),
+
+              if (!isReadOnly) ...[
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: 350,
+                  child: ElevatedButton(
+                    onPressed: _handleSubmit,
+                    child: const Text('Save'),
+                  ),
+                ),
+              ],
             ],
-            validator: (val) {
-              if (val == null || val.isEmpty) return 'Required';
-              if (val.length < 5) return 'Must be at least 5 characters';
-              return null;
-            },
           ),
-
-          const SizedBox(height: 16),
-          DropdownButtonFormField<CustomerStatus>(
-            value: _status,
-            decoration: const InputDecoration(labelText: 'Status'),
-            items: CustomerStatus.values.map((status) {
-              return DropdownMenuItem(value: status, child: Text(status.name));
-            }).toList(),
-            onChanged: isReadOnly
-                ? null
-                : (value) => setState(() => _status = value),
-            validator: (value) =>
-                value == null ? 'Please select a status' : null,
-          ),
-          if (!isReadOnly) ...[
-            const SizedBox(height: 20),
-            ElevatedButton(onPressed: _handleSubmit, child: const Text('Save')),
-          ],
-        ],
+        ),
       ),
     );
   }

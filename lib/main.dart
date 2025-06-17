@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
@@ -28,27 +29,47 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Color(0xFF667467),
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Center(
-          child: Text(
-            'Modules for the technical test',
-            style: TextStyle(
-              color: ColorsCore.greenFive,
-              fontSize: 52,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 100),
+                child: SizedBox(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: width * 0.1,
+                        height: height * 0.1,
+                        child: Image.asset('assets/images/cubes.png'),
+                      ),
+                      SizedBox(width: 50),
+                      Text(
+                        'Modules for tecnical test',
+                        style: TextStyle(
+                          color: ColorsCore.greenFive,
+                          fontSize: 62,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 50),
+                      SizedBox(
+                        width: width * 0.1,
+                        height: height * 0.1,
+                        child: Image.asset('assets/images/cubes.png'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               SizedBox(
                 height: 220,
                 width: 1020,
@@ -59,7 +80,7 @@ class HomeScreen extends StatelessWidget {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: const [
-                          Icon(Icons.people, size: 60), // si quieres mantenerlo
+                          Icon(Icons.people, size: 60),
                           Text(
                             'Module 1: Client Management (CRUD)',
                             style: TextStyle(
@@ -127,7 +148,7 @@ class HomeScreen extends StatelessWidget {
                         MaterialPageRoute(
                           builder: (_) => const MessageScreen(
                             customerId: 'ai_customer',
-                            customerName: 'Cliente IA',
+                            customerName: 'AI Client',
                             isAi: true,
                           ),
                         ),

@@ -6,4 +6,5 @@ class ColorsCore {
   static const greenThree = Color(0xFFA0BF9F);
   static const greenFour = Color(0xFFC1D9C1);
   static const greenFive = Color(0xFFCAD8C7);
+  static const whiteCustom = Color(0xFFD9D9D9);
 }

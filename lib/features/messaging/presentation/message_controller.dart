@@ -111,7 +111,7 @@ class MessageController extends StateNotifier<List<Message>> {
         'Allergy documentation received. This helps us ensure safe care.',
       );
     }
-    if (userInput.contains('id')) {
+    if (userInput.contains('dni')) {
       responses.add(
         'ID received. Registration is now complete. if you want to register another customer, ',
       );
@@ -173,9 +173,26 @@ class MessageController extends StateNotifier<List<Message>> {
     isTyping = true;
     state = List.from(state);
 
+    final allSimulatedResponses = [
+      'Got it, thanks for sending that.',
+      'Can you tell me a bit more about it?',
+      'I’ve received the file successfully.',
+      'Thanks, I’m reviewing it now.',
+      'Is there anything else I should know?',
+      'Perfect, I’ll move on to the next step.',
+      'Everything looks good so far.',
+      'Let me process that for you.',
+      'Give me a moment to check the data.',
+      'Thanks for your patience.',
+    ];
+
     final responses = isAiChat
         ? _generateAiResponses(content)
-        : ['Simulación de respuesta automática.'];
+        : [
+            allSimulatedResponses[Random().nextInt(
+              allSimulatedResponses.length,
+            )],
+          ];
 
     for (final text in responses) {
       await Future.delayed(Duration(seconds: 2 + Random().nextInt(2)));
@@ -356,7 +373,7 @@ class MessageController extends StateNotifier<List<Message>> {
   ) {
     final file = fileName.toLowerCase();
 
-    if (file.contains("insurance card")) {
+    if (file.contains("insurance")) {
       return {
         "insuranceProvider": "Blue Shield",
         "policyNumber": "1234567890",
@@ -389,7 +406,7 @@ class MessageController extends StateNotifier<List<Message>> {
 
     return {
       "note":
-          "No se pudo extraer información específica del archivo \"$fileName\".",
+          "Could not extract specific information from the file  \"$fileName\".",
     };
   }
 

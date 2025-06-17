@@ -4,6 +4,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:medical_onboarding_app/features/core/colors.dart';
 import 'package:medical_onboarding_app/features/messaging/domain/message_entity.dart';
 import 'package:medical_onboarding_app/features/messaging/presentation/message_controller.dart';
 import 'package:mime/mime.dart';
@@ -113,6 +114,9 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
       _sendInitialAiMessageIfNeeded();
     });
 
+    final width = MediaQuery.of(context).size.width;
+    final height = MediaQuery.of(context).size.height;
+
     print(widget.isAi);
     return Scaffold(
       appBar: AppBar(title: Text('Chat with ${widget.customerName}')),
@@ -123,149 +127,142 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               controller: _scrollController,
               padding: const EdgeInsets.all(8),
               itemCount: messages.length,
+
               itemBuilder: (context, index) {
                 final message = messages[index];
                 final isUser = message.sender == MessageSender.user;
 
-                if (message.attachment != null) {
-                  final attachment = message.attachment!;
-                  final isImage = attachment.mimeType.startsWith('image/');
+                final bubbleColor = isUser
+                    ? ColorsCore.greenFive
+                    : ColorsCore.greenOne;
+                final textColor = isUser ? Colors.black : Colors.white;
 
-                  return Align(
-                    alignment: isUser
-                        ? Alignment.centerRight
-                        : Alignment.centerLeft,
-                    child: Container(
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: isUser ? Colors.blue : Colors.grey[300],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: isUser
-                            ? CrossAxisAlignment.end
-                            : CrossAxisAlignment.start,
-                        children: [
-                          if (isImage)
-                            attachment.bytes != null
-                                ? Image.memory(
-                                    attachment.bytes!,
-                                    width: 150,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                  )
-                                : !kIsWeb && attachment.filePath != null
-                                ? Image.file(
-                                    File(attachment.filePath!),
-                                    width: 150,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                  )
-                                : const Text('Image cannot be load'),
-                          if (!isImage) ...[
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(
-                                  Icons.picture_as_pdf,
-                                  color: Colors.red,
-                                  size: 20,
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  attachment.fileName,
-                                  style: TextStyle(
-                                    color: isUser ? Colors.white : Colors.black,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              'File: ${attachment.mimeType}',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: isUser
-                                    ? Colors.white70
-                                    : Colors.grey[800],
-                                fontStyle: FontStyle.italic,
-                              ),
-                            ),
-                          ],
-                          if (isUser)
-                            Padding(
-                              padding: const EdgeInsets.only(top: 4),
-                              child: message.status == MessageStatus.sending
-                                  ? const SizedBox(
-                                      height: 12,
-                                      width: 12,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white70,
-                                      ),
-                                    )
-                                  : Text(
-                                      _statusText(message.status),
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        fontStyle: FontStyle.italic,
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  );
-                }
+                final avatar = isUser
+                    ? null
+                    : widget.isAi
+                    ? SizedBox(
+                        width: width * 0.1,
+                        height: height * 0.1,
+                        child: Image.asset('assets/images/pet_app.png'),
+                      )
+                    : Icon(Icons.person, size: 36);
 
-                return Align(
-                  alignment: isUser
-                      ? Alignment.centerRight
-                      : Alignment.centerLeft,
+                final screenWidth = MediaQuery.of(context).size.width;
+
+                final messageWidget = Flexible(
                   child: Container(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    padding: const EdgeInsets.all(10),
+                    constraints: BoxConstraints(maxWidth: screenWidth * 0.9),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 14,
+                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 6),
                     decoration: BoxDecoration(
-                      color: isUser ? Colors.blue : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
+                      color: bubbleColor,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        if (!isUser)
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 6,
+                            offset: const Offset(2, 2),
+                          ),
+                      ],
                     ),
                     child: Column(
                       crossAxisAlignment: isUser
                           ? CrossAxisAlignment.end
                           : CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          message.content ?? '',
-                          style: TextStyle(
-                            color: isUser ? Colors.white : Colors.black,
+                        if (message.attachment != null) ...[
+                          IntrinsicWidth(
+                            child: Row(
+                              mainAxisSize: MainAxisSize
+                                  .min, // Importante para que no ocupe todo el ancho
+                              children: [
+                                const Icon(
+                                  Icons.picture_as_pdf,
+                                  color: Colors.red,
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 8),
+                                Text(
+                                  'Attached file',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: textColor,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
+
+                          Text(
+                            message.attachment!.fileName,
+                            style: TextStyle(
+                              color: textColor,
+                              fontStyle: FontStyle.italic,
+                              fontSize: 12,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ] else
+                          Text(
+                            message.content ?? '',
+                            style: TextStyle(
+                              color: textColor,
+                              fontSize: 18,
+                              height: 1.4,
+                            ),
+                          ),
                         if (isUser)
                           Padding(
-                            padding: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.only(top: 6),
                             child: message.status == MessageStatus.sending
                                 ? const SizedBox(
-                                    height: 12,
-                                    width: 12,
+                                    height: 14,
+                                    width: 14,
                                     child: CircularProgressIndicator(
                                       strokeWidth: 2,
-                                      color: Colors.white70,
+                                      color: Colors.black26,
                                     ),
                                   )
                                 : Text(
                                     _statusText(message.status),
                                     style: const TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 11,
                                       fontStyle: FontStyle.italic,
-                                      color: Colors.white70,
+                                      color: Colors.black54,
                                     ),
                                   ),
                           ),
                       ],
                     ),
+                  ),
+                );
+
+                return Align(
+                  alignment: isUser
+                      ? Alignment.centerRight
+                      : Alignment.centerLeft,
+                  child: Row(
+                    mainAxisAlignment: isUser
+                        ? MainAxisAlignment.end
+                        : MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      if (!isUser)
+                        Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: avatar!,
+                          ),
+                        ),
+                      messageWidget,
+                    ],
                   ),
                 );
               },
@@ -293,6 +290,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> {
               children: [
                 Expanded(
                   child: TextField(
+                    textInputAction: TextInputAction.send,
                     controller: _controller,
                     decoration: const InputDecoration(
                       hintText: 'Type a message...',
